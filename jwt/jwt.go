@@ -27,3 +27,43 @@ func GenerateToken(data interface{}, secret string) (string, error) {
 	}
 	return tokenString, nil
 }
+
+func CheckToken(tokenString string, secret string) (bool, error) {
+	if secret == "" {
+		return false, errors.New("secret is empty")
+	}
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (i interface{}, e error) {
+		return []byte(secret), nil
+	})
+	if token == nil {
+		return false, errors.New("token is illegal")
+	}
+	if err != nil {
+		if v, ok := err.(*jwt.ValidationError); ok {
+			if v.Errors&jwt.ValidationErrorMalformed != 0 {
+				return false, errors.New("token format is incorrect")
+			} else if v.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+				return false, errors.New("token is expired")
+			} else {
+				return false, errors.New("token is error")
+			}
+		}
+	}
+	return true, nil
+}
+
+func ParseToken(token string, secret string) (jwt.MapClaims, error) {
+	if secret == "" {
+		return nil, errors.New("secret is empty")
+	}
+	tokenObj, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, e error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := tokenObj.Claims.(jwt.MapClaims); ok && tokenObj.Valid {
+		return claims, nil
+	}
+	return nil, errors.New("parse token error")
+}
