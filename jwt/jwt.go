@@ -5,6 +5,14 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+//
+// GenerateToken
+//  @Description: generate jwt token
+//  @param data : user claims
+//  @param secret : your own secret
+//  @return string
+//  @return error
+//
 func GenerateToken(data interface{}, secret string) (string, error) {
 	if secret == "" {
 		return "", errors.New("secret is empty")
@@ -28,6 +36,14 @@ func GenerateToken(data interface{}, secret string) (string, error) {
 	return tokenString, nil
 }
 
+//
+// CheckToken
+//  @Description: check jwt token
+//  @param tokenString : jwt to be checked
+//  @param secret : your own secret
+//  @return bool
+//  @return error
+//
 func CheckToken(tokenString string, secret string) (bool, error) {
 	if secret == "" {
 		return false, errors.New("secret is empty")
@@ -52,6 +68,14 @@ func CheckToken(tokenString string, secret string) (bool, error) {
 	return true, nil
 }
 
+//
+// ParseToken
+//  @Description:
+//  @param token : jwt to be parsed
+//  @param secret : your own secret
+//  @return jwt.MapClaims : user claims
+//  @return error
+//
 func ParseToken(token string, secret string) (jwt.MapClaims, error) {
 	if secret == "" {
 		return nil, errors.New("secret is empty")
